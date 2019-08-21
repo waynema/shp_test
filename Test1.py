@@ -1,22 +1,18 @@
-def setup(path_to_chromedriver, timeout, page_to_test):
-    driver = webdriver.Chrome(path_to_chromedriver)
-    driver.implicitly_wait(timeout)
-    driver.get(page_to_test)
+def setup(driver_loc, url):
+    driver = webdriver.Chrome(driver_loc)
+    driver.get(url)
 
     return driver
 
-def test(driver, xpath_start, xpath_end, length_req, find_longest):
+def test(driver, xpath_begin, xpath_end, length_req, find_longest):
     row_count = len(driver.find_elements_by_xpath("/" + xpath_end))
     length_req_satisfied = False
     len_max = 0
     if find_longest:
       longest_words = []
 
-    #Process all text rows on the page
     for i in range (1, row_count+1):
-        # build xpath to i's text row
-        text_xpath = xpath_start + "[" + str(i) + "]" + xpath_end
-        # print text_xpath
+        text_xpath = xpath_begin + "[" + str(i) + "]" + xpath_end
 
         try:
             row_text = driver.find_element_by_xpath(text_xpath)
@@ -25,7 +21,6 @@ def test(driver, xpath_start, xpath_end, length_req, find_longest):
             driver.quit()
             sys.exit(1)
 
-        # check that text row is actually displayed
         if row_text.is_displayed():
           logging.info("Text in row %d is displayed." %i)
         else:
@@ -95,18 +90,17 @@ if __name__ == '__main__':
     from selenium.common.exceptions import NoSuchElementException
 
     # test parameters
-    path_to_chromedriver = '/Users/wayne/Desktop/chromedriver'
-    timeout = 10
-    page_to_test = 'https://the-internet.herokuapp.com/dynamic_content'
-    xpath_start = "//div[@class='row']"
+    driver_loc = '/Users/wayne/Desktop/chromedriver'
+    url = 'https://the-internet.herokuapp.com/dynamic_content'
+    xpath_begin = "//div[@class='row']"
     xpath_end = "/div[@class='large-10 columns']"
     length_req = 10
     find_longest = True
     
-    driver = setup(path_to_chromedriver, timeout, page_to_test)
+    driver = setup(driver_loc, url)
     
     try:
-        test(driver, xpath_start, xpath_end, length_req, find_longest)
+        test(driver, xpath_begin, xpath_end, length_req, find_longest)
     except AssertionError as e:
         print(e)
     finally:

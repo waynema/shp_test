@@ -1,7 +1,6 @@
-def setup(path_to_chromedriver, timeout, page_to_test):
-    driver = webdriver.Chrome(path_to_chromedriver)
-    driver.implicitly_wait(timeout)
-    driver.get(page_to_test)
+def setup(driver_loc, url):
+    driver = webdriver.Chrome(driver_loc)
+    driver.get(url)
 
     return driver
 
@@ -12,11 +11,10 @@ def test(driver, xpath_avatars, punisher, known_avatars, assign_names):
     avatars = driver.find_elements_by_xpath(xpath_avatars)
 
     for n,av in enumerate(avatars, start = 1):
-
         url = av.get_attribute('src')
         logging.info("Avatar(row %d) URL is: %s" %(n,url))
 
-        f_name = 'row' + str(n) + 'av.jpg'
+        f_name = 'row' + str(n) + 'avatar.jpg'
         logging.info("Avatar(row %d) image downloaded as %s file" %(n,f_name))
         with open(f_name, 'wb') as out_f:
             resp = urllib.urlopen(url) 
@@ -60,7 +58,7 @@ def test(driver, xpath_avatars, punisher, known_avatars, assign_names):
                 punisher_row = n
                 break
 
-    print ('RESULTS\n====================')
+    print ('RESULTS OUTPUT\n====================')
     if assign_names:
         print("%d avatars found on the page:" %len(page_avatars))
         for av in page_avatars:
@@ -90,9 +88,8 @@ if __name__ == '__main__':
     from selenium import webdriver
     from selenium.common.exceptions import NoSuchElementException
 
-    path_to_chromedriver = '/Users/wayne/Desktop/chromedriver'
-    timeout = 10
-    page_to_test = 'https://the-internet.herokuapp.com/dynamic_content'
+    driver_loc = '/Users/wayne/Desktop/chromedriver'
+    url = 'https://the-internet.herokuapp.com/dynamic_content'
     xpath_avatars = "//div[@class='large-2 columns']/img"
     name_p = 'Punisher'
     url_p = 'https://the-internet.herokuapp.com/img/avatars/Original-Facebook-Geek-Profile-Avatar-3.jpg'
@@ -109,7 +106,7 @@ if __name__ == '__main__':
         known_avatars  = [punisher]
     assign_names = True 
 
-    driver = setup(path_to_chromedriver, timeout, page_to_test)
+    driver = setup(driver_loc, url)
     
     try:
         test(driver, xpath_avatars, punisher, known_avatars, assign_names)
